@@ -36,7 +36,7 @@ class GroupAware(models.Model):
     """
     
     group_content_type = models.ForeignKey(ContentType, null=True, blank=True)
-    group_object_id = models.PositiveIntegerField(null=True, blank=True)
+    group_object_id = models.PositiveIntegerField(null=True, blank=True, db_index=True)
     group = generic.GenericForeignKey("group_content_type", "group_object_id")
     
     class Meta:
@@ -152,7 +152,7 @@ class Group(GroupBase, GroupAware):
     slug = models.SlugField(_("slug"), unique=True)
     name = models.CharField(_("name"), max_length=80, unique=True)
     creator = models.ForeignKey(User, verbose_name=_("creator"), related_name="%(class)s_created")
-    created = models.DateTimeField(_("created"), default=datetime.datetime.now)
+    created = models.DateTimeField(_("created"), default=datetime.datetime.now, db_index=True)
     description = models.TextField(_("description"))
     
     def __unicode__(self):
@@ -168,7 +168,7 @@ class GroupScopedId(models.Model):
     """
     
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
-    object_id = models.IntegerField(null=True, blank=True)
+    object_id = models.IntegerField(null=True, blank=True, db_index=True)
     group = generic.GenericForeignKey()
     
     scoped_number = models.IntegerField()
