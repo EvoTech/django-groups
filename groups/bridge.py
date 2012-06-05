@@ -2,7 +2,8 @@ import sys
 
 from django.shortcuts import render_to_response
 from django.conf.urls.defaults import patterns, url as urlpattern
-from django.core.urlresolvers import RegexURLPattern, RegexURLResolver, reverse as dreverse
+from django.core import urlresolvers
+from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -86,17 +87,39 @@ class ContentBridge(object):
             return "%s%s_" % (parent_prefix, self.content_app_name)
         else:
             return ""
-    
-    def reverse(self, view_name, group, kwargs=None):
+
+    def reverse(self, view_name, group, kwargs=None,
+                       urlconf=None, prefix=None, current_app=None):
+        """Tried to reverse also patterns without group_slug"""
         if kwargs is None:
             kwargs = {}
-        
         final_kwargs = {}
-        
         final_kwargs.update(group.get_url_kwargs())
         final_kwargs.update(kwargs)
-        
-        return dreverse("%s%s" % (self._url_name_prefix, view_name), kwargs=final_kwargs)
+
+        try:
+            return_value =  urlresolvers.reverse(
+                "{0}{1}".format(self._url_name_prefix, view_name),
+                kwargs=final_kwargs,
+                urlconf=urlconf,
+                prefix=prefix,
+                current_app=current_app
+            )
+
+        except urlresolvers.NoReverseMatch:
+            # group is detected by subdomain or host name
+            final_kwargs.pop("{0}_slug".format(
+                self.group_model._meta.object_name.lower()
+            ))
+            return_value =  urlresolvers.reverse(
+                "{0}{1}".format(self._url_name_prefix, view_name),
+                kwargs=final_kwargs,
+                urlconf=urlconf,
+                prefix=prefix,
+                current_app=current_app
+            )
+
+        return return_value
     
     def render(self, template_name, context, context_instance=None):
         # @@@ this method is practically useless -- consider removing it.
