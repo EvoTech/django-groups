@@ -4,13 +4,13 @@ import warnings
 from django.db import models
 from django.db.models.options import FieldDoesNotExist
 from django.db.models.query import QuerySet
-from django.db.models.sql.constants import LOOKUP_SEP
 from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
+LOOKUP_SEP = '__'
 
 
 def _get_queryset(klass):
