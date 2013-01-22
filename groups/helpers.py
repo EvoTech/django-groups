@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.db import connection, transaction
 
 
@@ -24,18 +25,18 @@ def generate_next_scoped_id(content_object, scoped_id_model):
     }))
     if not created:
         sql = """
-        UPDATE %(table_name)s
+        UPDATE {table_name}
         SET scoped_number = scoped_number + 1
-        """ % {"table_name": qn(scoped_id_model._meta.db_table)}
+        """.format(**{"table_name": qn(scoped_id_model._meta.db_table)})
         if content_object.group:
             sql += """
             WHERE
-                content_type_id = %(content_type_id)s AND
-                object_id = %(object_id)s
-            """ % {
+                content_type_id = {content_type_id} AND
+                object_id = {object_id}
+            """.format(**{
                 "content_type_id": kwargs["content_type"].pk,
                 "object_id": kwargs["object_id"],
-            }
+            })
         try:
             try:
                 transaction.enter_transaction_management()

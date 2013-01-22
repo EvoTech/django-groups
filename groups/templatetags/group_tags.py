@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django import template
 from django.utils.encoding import smart_str
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -20,7 +21,7 @@ class GroupURLNode(template.Node):
         group = self.group.resolve(context)
         
         kwargs = {}
-        for k, v in self.kwargs.items():
+        for k, v in list(self.kwargs.items()):
             kwargs[smart_str(k, "ascii")] = v.resolve(context)
         
         if group:
@@ -101,8 +102,10 @@ def groupurl(parser, token):
     bits = token.contents.split()
     tag_name = bits[0]
     if len(bits) < 3:
-        raise template.TemplateSyntaxError("'%s' takes at least two arguments"
-            " (path to a view and a group)" % tag_name)
+        raise template.TemplateSyntaxError(
+            ("'{0}' takes at least two arguments" +
+             " (path to a view and a group)").format(tag_name)
+        )
     
     view_name = bits[1]
     group = parser.compile_filter(bits[2])
@@ -114,7 +117,7 @@ def groupurl(parser, token):
         bits = iter(bits[3:])
         for bit in bits:
             if bit == "as":
-                asvar = bits.next()
+                asvar = next(bits)
                 break
             else:
                 for arg in bit.split(","):
@@ -123,7 +126,9 @@ def groupurl(parser, token):
                         k = k.strip()
                         kwargs[k] = parser.compile_filter(v)
                     elif arg:
-                        raise template.TemplateSyntaxError("'%s' does not support non-kwargs arguments." % tag_name)
+                        raise template.TemplateSyntaxError(
+                            "'{0}' does not support non-kwargs arguments.".format(tag_name)
+                        )
     
     return GroupURLNode(view_name, group, kwargs, asvar)
 
@@ -142,7 +147,9 @@ def content_objects(parser, token):
     """
     bits = token.split_contents()
     if len(bits) not in [5, 6]:
-        raise template.TemplateSyntaxError("'%s' requires five or six arguments." % bits[0])
+        raise template.TemplateSyntaxError(
+            "'{0}' requires five or six arguments.".format(bits[0])
+        )
     else:
         if len(bits) == 5:
             return ContentObjectsNode(bits[1], bits[2], None, bits[4])
@@ -161,20 +168,26 @@ def object_group_url(parser, token):
     bits = token.contents.split()
     tag_name = bits[0]
     if len(bits) < 3:
-        raise template.TemplateSyntaxError("'%s' takes at least two arguments"
-            " (object and a group)" % tag_name)
+        raise template.TemplateSyntaxError(
+            ("'{0}' takes at least two arguments" +
+             " (object and a group)").format(tag_name)
+        )
     
     obj = bits[1]
     group = parser.compile_filter(bits[2])
     
     if len(bits) > 3:
         if bits[3] != "as":
-            raise template.TemplateSyntaxError("'%s' requires the forth"
-                " argument to be 'as'" % tag_name)
+            raise template.TemplateSyntaxError(
+                ("'{0}' requires the forth" +
+                 " argument to be 'as'").format(tag_name)
+            )
         try:
             asvar = bits[4]
         except IndexError:
-            raise template.TemplateSyntaxError("'%s' requires an argument"
-                " after 'as'" % tag_name)
+            raise template.TemplateSyntaxError(
+                ("'{0}' requires an argument" +
+                 " after 'as'").format(tag_name)
+            )
     
     return ObjectGroupUrlNode(obj, group, asvar)

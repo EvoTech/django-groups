@@ -1,10 +1,11 @@
+from __future__ import absolute_import, unicode_literals
 import copy
 
 
 
 class GroupDummy(object):
     
-    def __nonzero__(self):
+    def __bool__(self):
         return False
 
 
@@ -16,7 +17,7 @@ class GroupRequestHelper(object):
     
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
-        for k, v in self.__dict__.iteritems():
+        for k, v in self.__dict__.items():
             if k == "request":
                 continue
             setattr(obj, k, copy.deepcopy(v, memo))

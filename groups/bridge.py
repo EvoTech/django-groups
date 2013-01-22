@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 import sys
 
 from django.shortcuts import render_to_response
@@ -55,7 +56,7 @@ class ContentBridge(object):
                 else:
                     # @@@ this seems sketchy
                     name = ""
-                name = "%s_%s" % (prefix, name)
+                name = "{0}_{1}".format(prefix, name)
                 
                 extra_kwargs.update(kwargs)
                 extra_kwargs.update(url.default_args)
@@ -84,7 +85,7 @@ class ContentBridge(object):
             parent_prefix = ""
             if self.parent_bridge is not None:
                 parent_prefix = self.parent_bridge._url_name_prefix
-            return "%s%s_" % (parent_prefix, self.content_app_name)
+            return "{0}{1}_".format(parent_prefix, self.content_app_name)
         else:
             return ""
 
@@ -125,12 +126,12 @@ class ContentBridge(object):
         # @@@ this method is practically useless -- consider removing it.
         ctype = ContentType.objects.get_for_model(self.group_model)
         return render_to_response([
-            "%s/%s/%s" % (ctype.app_label, self.content_app_name, template_name),
-            "%s/%s" % (self.content_app_name, template_name),
+            "{0}/{1}/{2}".format(ctype.app_label, self.content_app_name, template_name),
+            "{0}/{1}".format(self.content_app_name, template_name),
         ], context, context_instance=context_instance)
     
     def group_base_template(self, template_name="content_base.html"):
-        return "%s/%s" % (self.content_app_name, template_name)
+        return "{0}/{1}".format(self.content_app_name, template_name)
     
     def get_group(self, kwargs):
         
@@ -142,7 +143,7 @@ class ContentBridge(object):
         else:
             parent_group = None
         
-        slug = kwargs.pop("%s_slug" % self.group_model._meta.object_name.lower())
+        slug = kwargs.pop("{0}_slug".format(self.group_model._meta.object_name.lower()))
         
         lookup_params.update({
             "slug": slug,

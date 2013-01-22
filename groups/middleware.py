@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.utils.functional import curry

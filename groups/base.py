@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 import datetime
 import warnings
 
@@ -58,7 +59,7 @@ class GroupBase(models.Model):
             try:
                 field = self._meta.get_field("members")
             except FieldDoesNotExist:
-                raise NotImplementedError("You must define a member_queryset for %s" % str(self.__class__))
+                raise NotImplementedError("You must define a member_queryset for {0}".format(str(self.__class__)))
             else:
                 self._members_field = field
         else:
@@ -66,7 +67,7 @@ class GroupBase(models.Model):
         if isinstance(field, models.ManyToManyField) and issubclass(field.rel.to, User):
             return self.members.all()
         else:
-            raise NotImplementedError("You must define a member_queryset for %s" % str(self.__class__))
+            raise NotImplementedError("You must define a member_queryset for {0}".format(str(self.__class__)))
     
     def user_is_member(self, user):
         return user in self.member_queryset()
@@ -93,12 +94,11 @@ class GroupBase(models.Model):
         except IndexError:
             from django.db.models.loading import cache as app_cache
             model = app_cache.get_model(opts.app_label, opts.module_name)
-            raise LookupError("Unable to find generic foreign key named '%s' "
-                "on %r\nThe model may have a different name or it does not "
-                "exist." % (
-                    field_name,
-                    model,
-                ))
+            raise LookupError(
+                ("Unable to find generic foreign key named '{0}' on {1!r}\n" +
+                 "The model may have a different name or it does not " +
+                 "exist.").format(field_name, model)
+            )
         return field
     
     def lookup_params(self, model):
@@ -116,8 +116,8 @@ class GroupBase(models.Model):
         group_gfk = self._group_gfk_field(queryset.model, join=join, field_name=gfk_field)
         if join:
             lookup_kwargs = {
-                "%s__%s" % (join, group_gfk.fk_field): self.id,
-                "%s__%s" % (join, group_gfk.ct_field): content_type,
+                "{0}__{1}".format(join, group_gfk.fk_field): self.id,
+                "{0}__{1}".format(join, group_gfk.ct_field): content_type,
             }
         else:
             lookup_kwargs = {
@@ -140,7 +140,7 @@ class GroupBase(models.Model):
         if hasattr(self, "group") and self.group:
             kwargs.update(self.group.get_url_kwargs())
         slug = getattr(self, self.slug_attr)
-        kwargs.update({"%s_slug" % self._meta.object_name.lower(): slug})
+        kwargs.update({"{0}_slug".format(self._meta.object_name.lower()): slug})
         return kwargs
 
 
