@@ -11,6 +11,11 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
+try:
+    str = unicode  # Python 2.* compatible
+except NameError:
+    pass
+
 LOOKUP_SEP = '__'
 
 
@@ -155,7 +160,7 @@ class Group(GroupBase, GroupAware):
     created = models.DateTimeField(_("created"), default=datetime.datetime.now, db_index=True)
     description = models.TextField(_("description"))
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta(object):
@@ -176,3 +181,13 @@ class GroupScopedId(models.Model):
     class Meta:
         abstract = True
         unique_together = (("content_type", "object_id", "scoped_number"),)
+
+try:
+    unicode
+except NameError:
+    pass
+else:
+    for cls in (Tribe, TribeMember, TribeRole, TribeMemberRole,
+                TribeMemberHistory, ):
+        cls.__unicode__ = cls.__str__
+        cls.__str__ = lambda self: self.__unicode__().encode('utf-8')
