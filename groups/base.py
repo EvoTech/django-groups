@@ -187,7 +187,6 @@ try:
 except NameError:
     pass
 else:
-    for cls in (Tribe, TribeMember, TribeRole, TribeMemberRole,
-                TribeMemberHistory, ):
+    for cls in (Group, ):
         cls.__unicode__ = cls.__str__
         cls.__str__ = lambda self: self.__unicode__().encode('utf-8')
