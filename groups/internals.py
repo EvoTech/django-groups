@@ -7,6 +7,15 @@ class GroupDummy(object):
     
     def __bool__(self):
         return False
+    
+    def __nonzero__(self):  # Python 2 compatible
+        return False
+    
+    def __int__(self):
+        return 0
+    
+    def __str__(self):
+        return ''
 
 
 class GroupRequestHelper(object):
