@@ -148,6 +148,13 @@ class GroupBase(models.Model):
         kwargs.update({"{0}_slug".format(self._meta.object_name.lower()): slug})
         return kwargs
 
+    def __reduce__(self):
+        r = list(super(GroupBase, self).__reduce__())
+        for k, v in r[2].copy().items():
+            if k == 'request':
+                del r[2][k]
+        return tuple(r)
+
 
 class Group(GroupBase, GroupAware):
     """
